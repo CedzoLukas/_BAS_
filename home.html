@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BAS</title>
+    <link rel="manifest" href="manifest.json">
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+            .then(function() {
+                console.log('Service Worker Registered');
+            });
+        }
+    </script>
+    <style>
+        :root {
+            --background-image: url('WallpaperBAS.jpg');
+            --background-color: rgba(0, 0, 0, 0.7); /* Overlay for dark mode */
+            --text-color-light: rgb(0, 0, 0); /* Light text for dark mode */
+            --text-color-dark: rgb(255, 255, 255); /* Dark text for light mode */
+            --button-bg-color: #000000;
+            --button-text-color: rgb(253, 253, 253);
+        }
+
+        [data-theme="dark"] {
+            --background-image: url('wallpaper2.png'); /* Updated background image for dark mode */
+            --background-color: #000000; /* Dark mode background color */
+            --text-color: var(--text-color-light); /* Light text for dark mode */
+            --button-bg-color: #000000;
+            --button-text-color: #ffffff;
+        }
+
+        [data-theme="light"] {
+            --background-image: url('WallpaperBAS.jpg'); /* Background image for light mode */
+            --background-color: rgba(255, 255, 255, 1); /* Light mode background color */
+            --text-color: var(--text-color-dark); /* Dark text for light mode */
+            --button-bg-color: #000000;
+            --button-text-color: rgb(253, 253, 253);
+        }
+
+        body {
+            background-image: var(--background-image);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            color: var(--text-color); /* Set text color based on theme */
+            transition: color 0.3s ease, background-color 0.3s ease; /* Smooth transitions */
+        }
+
+        .content {
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        input[type="file"] {
+            width: 80%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 3px solid #2b2b2b;
+            border-radius: 4px;
+            background-color: rgb(0, 0, 0);
+            color: white;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: var(--button-bg-color);
+            color: var(--button-text-color);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #222222;
+        }
+
+        #Image {
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        img {
+            max-width: 100%;
+            margin-top: 10px;
+        }
+
+        #daily-challenge {
+            color: var(--text-color);
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        /* Footer bar styling */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+
+        .footer img {
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+        }
+
+        /* User Menu */
+        .user-menu {
+            position: fixed;
+            left: -400px; /* Off-screen */
+            top: 0;
+            width: 300px;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: var(--text-color);
+            transition: left 0.3s ease; /* Slide effect */
+            padding: 20px;
+            box-shadow: 5px 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+        }
+
+        .user-menu.active {
+            left: 0; /* Slide in when active */
+        }
+
+        .user-menu h2 {
+            margin-bottom: 20px;
+        }
+
+        .user-info {
+            margin-bottom: 10px;
+        }
+
+        .user-menu button {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        /* Settings Menu */
+        .settings-menu {
+            position: fixed;
+            right: -300px; /* Off-screen */
+            top: 0;
+            width: 300px;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: var(--text-color);
+            transition: right 0.3s ease; /* Slide effect */
+            padding: 20px;
+            box-shadow: -5px 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            display: none; /* Hidden by default */
+        }
+
+        .settings-menu.active {
+            display: block; /* Show the menu when active */
+            right: 0; /* Slide in when active */
+        }
+
+        .settings-menu button {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .contact-button {
+            padding: 10px 20px;
+            background-color: var(--button-bg-color);
+            color: var(--button-text-color);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+            text-align: center;
+            display: inline-block; /* Behave like a block element */
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <div class="content">
+        <h1>BAS</h1>
+        <div id="daily-challenge"></div>
+
+        <label for="image-upload">Upload a photo for today's challenge:</label>
+        <input type="file" id="image-upload" name="image-upload" accept="image/*">
+        <button id="upload-button">Upload</button>
+        <div id="Image"></div>
+    </div>
+
+    <!-- Footer Navigation Bar -->
+    <div class="footer">
+        <img src="user.png" alt="User" onclick="toggleUserMenu()">
+        <img src="mainpage.png" alt="Main Page" onclick="goToMainPage()">
+        <img src="camera.png" alt="Camera" onclick="triggerImageUpload()">
+        <img src="leader.png" alt="Leader Board" onclick="openLeaderBoard()">
+        <img src="setting.png" alt="Settings" onclick="toggleSettingsMenu()">
+    </div>
+
+    <!-- User Info Menu -->
+    <div class="user-menu" id="user-menu">
+        <h2>User Info</h2>
+        <p class="user-info" id="username-display">Username: </p>
+        <p class="user-info" id="email-display">Email: </p>
+        <p class="user-info" id="password-display">Password: </p>
+        <button onclick="logout()">Log Out</button>
+    </div>
+
+    <!-- Settings Menu -->
+    <div class="settings-menu" id="settings-menu">
+        <h2>Settings</h2>
+        <button id="theme-toggle">Toggle Dark/Light Theme</button>
+        <a href="mailto:basaap.contact@gmail.com" class="contact-button">Contact us on: basaap.contact@gmail.com</a>
+        <button onclick="closeSettingsMenu()">Close</button>
+    </div>
+
+    <script>
+        // Toggle user menu visibility
+        function toggleUserMenu() {
+            const userMenu = document.getElementById('user-menu');
+            userMenu.classList.toggle('active');
+            displayUserInfo(); // Call to display user info when opening the menu
+        }
+
+        // Display the logged-in user info
+        function displayUserInfo() {
+            const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+            if (loggedInUser) {
+                document.getElementById('username-display').textContent = `Username: ${loggedInUser.username}`;
+                document.getElementById('email-display').textContent = `Email: ${loggedInUser.email}`;
+                document.getElementById('password-display').textContent = `Password: ${loggedInUser.password}`;
+            }
+        }
+
+        // Log out the user
+        function logout() {
+            localStorage.removeItem('loggedInUser');
+            window.location.href = 'login.html'; // Redirect to login page
+        }
+
+        // Trigger the file input (camera icon functionality)
+        function triggerImageUpload() {
+            document.getElementById('image-upload').click();
+        }
+
+        // Redirect to the main page
+        function goToMainPage() {
+            window.location.href = 'index.html'; // Change 'index.html' to your actual main page file
+        }
+
+        function openLeaderBoard() {
+            alert("Opening leaderboard...");
+        }
+
+        // Toggle settings menu visibility
+        function toggleSettingsMenu() {
+            const settingsMenu = document.getElementById('settings-menu');
+            settingsMenu.classList.toggle('active');
+        }
+
+        function closeSettingsMenu() {
+            const settingsMenu = document.getElementById('settings-menu');
+            settingsMenu.classList.remove('active');
+        }
+
+        // Toggle between dark and light themes
+        const themeToggleButton = document.getElementById('theme-toggle');
+        themeToggleButton.addEventListener('click', function() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', newTheme);
+        });
+
+        // Display today's challenge
+        function getDailyChallenge() {
+            const challenges = [
+                "Pick up 5 bottle caps and recycle them.",
+                "Pick up 5 bottles and recycle them.",
+                "Recycle 4 items.",
+                "Plant a tree or a small plant.",
+                "Recycle 5 pieces of paper you found.",
+                "Turn off unnecessary lights for a whole day.",
+                "Fill up a garbage bag with trash."
+            ];
+            const currentDate = new Date();
+            const dayOfMonth = currentDate.getDate();
+            const challengeIndex = dayOfMonth % challenges.length;
+            return challenges[challengeIndex];
+        }
+
+        document.getElementById('daily-challenge').innerText = `Today's Challenge: ${getDailyChallenge()}`;
+
+        // Call displayUserInfo on page load to show user info if available
+        window.onload = function() {
+            displayUserInfo();
+        };
+    </script>
+</body>
+</html>

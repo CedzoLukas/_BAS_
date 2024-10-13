@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: url('WallpaperBAS.jpg'); /* Background image */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        form {
+            padding: 30px;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+        input[type="text"], input[type="password"] {
+            width: 95%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 2px solid #ccc;
+        }
+        button {
+            padding: 10px;
+            background-color: #000;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #555;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <form id="login-form">
+        <h2>Login</h2>
+        <input type="text" id="login-username" placeholder="Username" required>
+        <input type="password" id="login-password" placeholder="Password" required>
+        <label>
+            <input type="checkbox" id="remember-me"> Remember Me
+        </label>
+        <button type="submit">Login</button>
+    </form>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+
+            // Retrieve accounts from localStorage
+            const accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+
+            // Check if the account exists
+            const account = accounts.find(acc => acc.username === username && acc.password === password);
+
+            if (account) {
+                if (document.getElementById('remember-me').checked) {
+                    localStorage.setItem('rememberedUser', username); // Remember username for future sessions
+                }
+                alert('Login successful!');
+                window.location.href = 'home.html'; // Redirect to the main page after login
+            } else {
+                alert('Invalid username or password');
+            }
+        });
+
+        // Auto-fill the username if "Remember Me" was selected before
+        window.onload = function() {
+            const rememberedUser = localStorage.getItem('rememberedUser');
+            if (rememberedUser) {
+                document.getElementById('login-username').value = rememberedUser;
+            }
+        };
+    </script>
+</body>
+</html>
